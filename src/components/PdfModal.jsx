@@ -7,11 +7,13 @@ import Modal from '@mui/material/Modal';
 import { Document, Page } from 'react-pdf'
 import { useEffect, useState } from 'react';
 import { SizeMe } from 'react-sizeme';
-import dynamic from 'next/dynamic';
+// import printJS from 'print-js';
+// import dynamic from 'next/dynamic';
 
-const printJS = dynamic(() => import('print-js'), {
-    ssr: false
-});
+
+// const printJS = dynamic(() => import('print-js'), {
+//     ssr: false
+// });
 
 // import { Viewer, Worker } from '@react-pdf-viewer/core';
 // import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
@@ -66,11 +68,12 @@ export default function PdfModal({ isPdfModalShow, setIsPdfModalShow }) {
     }
 
     const printPdf = () => {
-        if (printJS == null) {
+        if (window.printJS == null) {
             console.warn('[WARN] printJS can not be used in server context')
             return
         }
-        printJS('/pdf-file.pdf')
+        window.printJS('/pdf-file.pdf');
+        // printJS('/pdf-file.pdf')
     }
 
     useEffect(() => {
@@ -85,6 +88,13 @@ export default function PdfModal({ isPdfModalShow, setIsPdfModalShow }) {
             window.removeEventListener('resize', onResize)
         }
     }, [])
+
+    useEffect(() => {
+        // Import 'print-js' dynamically when the component mounts in the browser
+        import('print-js').then((printJS) => {
+          window.printJS = printJS.default;
+        });
+    }, []);
 
     return (
         <div>
